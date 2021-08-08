@@ -1,9 +1,13 @@
 const word_el = document.querySelector('#word');
 const popup = document.querySelector('#popup-container');
-const message_
+const message_el = document.querySelector('#success-message');
+const wrongLetters_el = document.querySelector('#wrong-letters');
+const items = document.querySelectorAll('.item'); 
 
-const corretLetters = ['j','a','v','s','t'];
+const correctLetters = [];
 const wrongLetters =[];
+const selectedWord = getRandomWord();
+
 
 function getRandomWord(){
     const words =["javascript","java","phyton"];
@@ -13,13 +17,10 @@ function getRandomWord(){
 
 
 function displayWord(){
-    const selectedWord = getRandomWord(); 
-
     word_el.innerHTML = `
        ${selectedWord.split('').map(letter => `
          <div class ="letter"> 
-            ${corretLetters.includes(letter) ? letter: ''}
-
+            ${correctLetters.includes(letter) ? letter: ''}
          </div>
        ` 
        ).join('')}
@@ -30,7 +31,59 @@ function displayWord(){
    const w = word_el.innerText.replace(/\n/g,'');
    if(w === selectedWord){
        popup.style.display = 'flex';
+       message_el.innerText = 'Tebrikler Qazandiniz.';
        
    }
+
 }
+
+function updateWrongLetters() {
+    wrongLetters_el.innerHTML = `
+    ${wrongLetters.length>0?'<h3>xetali herfler</h3>':''}
+    ${wrongLetters.map(letter => `<span>${letter}</span>`)}
+        
+
+    `;
+
+    items.forEach((item,index) => {
+        const errorCount = wrongLetters.length;
+
+
+        if(index < errorCount){
+            item.style.display ='block';
+        }else{
+            item.style.display ='none';
+        }
+    })
+
+    if(wrongLetters.length === items.length) {
+        popup.style.display = 'flex';
+        message_el.innerText = 'Tebrikler Qazandiniz.';
+        
+    }
+}
+
+window.addEventListener('keydown',function(e){
+    if(e.keyCode >= 65 && e.keyCode <= 90){
+        const letter = e.key;
+
+        if(selectedWord.includes(letter)) {
+            if(!correctLetters.includes(letter)){
+                correctLetters.push(letter);
+                displayWord();
+            } else {
+              console.log( 'bu herfi elave etmisiniz.');
+            }
+
+            } else {
+                if(!wrongLetters.includes(letter)) {
+                    wrongLetters.push(letter);
+                    updateWrongLetters();
+                    
+                }
+            }
+    }    
+
+});
+
 displayWord()
